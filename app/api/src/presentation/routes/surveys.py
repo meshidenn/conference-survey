@@ -50,6 +50,10 @@ async def create_survey(request: CreateSurveyRequest) -> SurveyResponse:
         year=survey.conference.year,
         status=survey.status.value,
         paper_count=len(survey.papers),
+        progress_message=survey.progress_message,
+        progress_current=survey.progress_current,
+        progress_total=survey.progress_total,
+        error_message=survey.error_message,
     )
 
 
@@ -85,7 +89,7 @@ async def get_survey(survey_id: str) -> SurveyDetailResponse:
             parent_id=str(node.parent_id) if node.parent_id else None,
             child_ids=[str(cid) for cid in node.child_ids],
             paper_ids=[str(pid) for pid in node.paper_ids],
-            paper_count=node.paper_count,
+            paper_count=survey.tag_hierarchy.get_total_paper_count(node.id),
             summary=node.summary,
         )
         for node in survey.tag_hierarchy.nodes.values()
@@ -98,6 +102,10 @@ async def get_survey(survey_id: str) -> SurveyDetailResponse:
         status=survey.status.value,
         papers=papers,
         tag_hierarchy=tag_nodes,
+        progress_message=survey.progress_message,
+        progress_current=survey.progress_current,
+        progress_total=survey.progress_total,
+        error_message=survey.error_message,
     )
 
 
@@ -114,6 +122,10 @@ async def list_surveys() -> list[SurveyResponse]:
             year=survey.conference.year,
             status=survey.status.value,
             paper_count=len(survey.papers),
+            progress_message=survey.progress_message,
+            progress_current=survey.progress_current,
+            progress_total=survey.progress_total,
+            error_message=survey.error_message,
         )
         for survey in surveys
     ]
@@ -138,6 +150,18 @@ async def process_survey(
     if survey is None:
         raise HTTPException(status_code=404, detail="Survey not found")
 
+    if survey.status.value == "processing":
+        raise HTTPException(
+            status_code=409,
+            detail="Processing already in progress",
+        )
+
+    if survey.status.value not in ("pending", "failed"):
+        raise HTTPException(
+            status_code=409,
+            detail=f"Cannot start processing from status: {survey.status.value}",
+        )
+
     # バックグラウンドで処理を実行
     use_case = get_process_survey_use_case()
     background_tasks.add_task(use_case.execute, survey.id)
@@ -148,23 +172,54 @@ async def process_survey(
         year=survey.conference.year,
         status="processing",  # 処理開始を示す
         paper_count=len(survey.papers),
+        progress_message=survey.progress_message,
+        progress_current=survey.progress_current,
+        progress_total=survey.progress_total,
+        error_message=survey.error_message,
     )
 
 
-def _build_mindmap_node(node: TagNode, hierarchy_nodes: dict) -> MindmapNode:
+def _build_mindmap_node(node: TagNode, hierarchy_nodes: dict, tag_hierarchy) -> MindmapNode:
     """TagNodeからMindmapNodeを構築する."""
     children = []
     for child_id in node.child_ids:
         child_node = hierarchy_nodes.get(child_id)
         if child_node:
-            children.append(_build_mindmap_node(child_node, hierarchy_nodes))
+            children.append(_build_mindmap_node(child_node, hierarchy_nodes, tag_hierarchy))
 
     return MindmapNode(
         id=str(node.id),
         name=node.name,
         summary=node.summary,
-        paper_count=node.paper_count,
+        paper_count=tag_hierarchy.get_total_paper_count(node.id),
         children=children,
+    )
+
+
+@router.get("/{survey_id}/status", response_model=SurveyResponse)
+async def get_survey_status(survey_id: str) -> SurveyResponse:
+    """サーベイのステータスと進捗を取得する（軽量）."""
+    try:
+        uuid_id = UUID(survey_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid survey ID format")
+
+    repository = get_survey_repository()
+    survey = await repository.find_by_id(SurveyId(uuid_id))
+
+    if survey is None:
+        raise HTTPException(status_code=404, detail="Survey not found")
+
+    return SurveyResponse(
+        id=str(survey.id),
+        conference_type=survey.conference.type.value,
+        year=survey.conference.year,
+        status=survey.status.value,
+        paper_count=len(survey.papers),
+        progress_message=survey.progress_message,
+        progress_current=survey.progress_current,
+        progress_total=survey.progress_total,
+        error_message=survey.error_message,
     )
 
 
@@ -185,7 +240,7 @@ async def get_mindmap(survey_id: str) -> MindmapResponse:
     # ルートノードからマインドマップを構築
     hierarchy_nodes = {node.id: node for node in survey.tag_hierarchy.nodes.values()}
     root_nodes = [
-        _build_mindmap_node(node, hierarchy_nodes)
+        _build_mindmap_node(node, hierarchy_nodes, survey.tag_hierarchy)
         for node in survey.tag_hierarchy.get_root_nodes()
     ]
 

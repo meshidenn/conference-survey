@@ -16,7 +16,10 @@ class HierarchyAgent:
         "- Create 5-10 top-level categories\n"
         "- Group related research topics together\n"
         "- Use clear, descriptive category names\n"
-        "- Each tag should belong to exactly one category\n"
+        "- You may rename or rephrase child names for clarity\n"
+        "- Each child must list the original input tags it covers "
+        "in the 'original_tags' field using the EXACT original names\n"
+        "- Every input tag must appear in exactly one child\n"
         "- Return the result in JSON format"
     )
 
@@ -48,7 +51,12 @@ class HierarchyAgent:
             階層構造を表す辞書
             {
                 "categories": [
-                    {"name": "Category Name", "children": ["tag1", "tag2"]},
+                    {
+                        "name": "Category Name",
+                        "children": [
+                            {"name": "Child Name", "original_tags": ["tag1", "tag2"]}
+                        ]
+                    },
                     ...
                 ]
             }
@@ -57,11 +65,19 @@ class HierarchyAgent:
         prompt = (
             "Organize the following research topic tags "
             "into 5-10 hierarchical categories.\n\n"
+            "You may rename or group tags into clearer child names, "
+            "but each child must list which original input tags it covers.\n\n"
             f"Tags:\n{tags_str}\n\n"
             "Return the result in the following JSON format:\n"
             "{\n"
             '    "categories": [\n'
-            '        {"name": "Category Name", "children": ["tag1", "tag2", "tag3"]},\n'
+            "        {\n"
+            '            "name": "Category Name",\n'
+            '            "children": [\n'
+            '                {"name": "Child Name", "original_tags": ["tag1", "tag2"]},\n'
+            '                {"name": "Another Child", "original_tags": ["tag3"]}\n'
+            "            ]\n"
+            "        },\n"
             "        ...\n"
             "    ]\n"
             "}"

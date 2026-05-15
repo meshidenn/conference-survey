@@ -13,9 +13,10 @@ class Settings(BaseSettings):
     app_name: str = "Conference Survey API"
     debug: bool = False
 
-    # LLM設定
-    llm_api_base: str = "http://localhost:11434"
-    llm_model_name: str = "ollama/gemma3:4b"
+    # LLM設定（LM Studio: OpenAI互換API, デフォルト http://localhost:1234/v1）
+    llm_api_base: str = "http://localhost:1234/v1"
+    llm_model_name: str = "google/gemma-4-e4b"
+    llm_max_concurrent: int = 3
 
     # データベース設定
     database_url: str = "sqlite:///./data/survey.db"

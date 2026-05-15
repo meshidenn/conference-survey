@@ -8,6 +8,7 @@ class CreateSurveyRequest(BaseModel):
 
     conference_type: str = Field(
         ...,
+        alias="conferenceType",
         description="学会種別 (ACL, NAACL, EMNLP, EACL)",
         examples=["ACL"],
     )
@@ -74,6 +75,10 @@ class SurveyResponse(BaseModel):
     year: int = Field(..., description="開催年度")
     status: str = Field(..., description="処理ステータス")
     paper_count: int = Field(0, alias="paperCount", description="論文数")
+    progress_message: str = Field("", alias="progressMessage", description="進捗メッセージ")
+    progress_current: int = Field(0, alias="progressCurrent", description="現在の進捗数")
+    progress_total: int = Field(0, alias="progressTotal", description="合計数")
+    error_message: str = Field("", alias="errorMessage", description="エラーメッセージ")
 
     model_config = ConfigDict(
         from_attributes=True,
@@ -92,6 +97,10 @@ class SurveyDetailResponse(BaseModel):
     tag_hierarchy: list[TagNodeResponse] = Field(
         default_factory=list, alias="tagHierarchy", description="タグ階層構造"
     )
+    progress_message: str = Field("", alias="progressMessage", description="進捗メッセージ")
+    progress_current: int = Field(0, alias="progressCurrent", description="現在の進捗数")
+    progress_total: int = Field(0, alias="progressTotal", description="合計数")
+    error_message: str = Field("", alias="errorMessage", description="エラーメッセージ")
 
     model_config = ConfigDict(
         from_attributes=True,

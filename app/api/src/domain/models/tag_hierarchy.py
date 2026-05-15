@@ -76,6 +76,25 @@ class TagHierarchy:
         )
         return sorted_nodes
 
+    def get_total_paper_count(self, tag_id: TagId) -> int:
+        """ノードとその子孫の論文数を合算して返す.
+
+        Args:
+            tag_id: 対象ノードのID
+
+        Returns:
+            自身＋子孫の重複除外済み論文数
+        """
+        node = self.nodes.get(tag_id)
+        if node is None:
+            return 0
+        paper_ids = set(node.paper_ids)
+        for child_id in node.child_ids:
+            child = self.nodes.get(child_id)
+            if child:
+                paper_ids.update(child.paper_ids)
+        return len(paper_ids)
+
     def _calculate_depth(self, tag_id: TagId) -> int:
         """ノードの深さを計算する.
 

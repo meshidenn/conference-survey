@@ -36,6 +36,22 @@ class Survey:
     status: SurveyStatus = SurveyStatus.PENDING
     papers: list[Paper] = field(default_factory=list)
     tag_hierarchy: TagHierarchy = field(default_factory=TagHierarchy)
+    progress_message: str = ""
+    progress_current: int = 0
+    progress_total: int = 0
+    error_message: str = ""
+
+    def update_progress(self, message: str, current: int = 0, total: int = 0) -> None:
+        """進捗を更新する.
+
+        Args:
+            message: 現在のステップの説明
+            current: 現在の進捗数
+            total: 合計数
+        """
+        self.progress_message = message
+        self.progress_current = current
+        self.progress_total = total
 
     def add_paper(self, paper: Paper) -> None:
         """論文を追加する.
@@ -60,12 +76,12 @@ class Survey:
         return None
 
     def start_processing(self) -> None:
-        """処理を開始する.
+        """処理を開始する（初回または再試行）.
 
         Raises:
-            ValueError: 既に処理中または完了/失敗している場合
+            ValueError: 既に処理中または完了している場合
         """
-        if self.status != SurveyStatus.PENDING:
+        if self.status not in (SurveyStatus.PENDING, SurveyStatus.FAILED):
             raise ValueError(f"Cannot start processing from status: {self.status}")
         self.status = SurveyStatus.PROCESSING
 
@@ -79,8 +95,11 @@ class Survey:
             raise ValueError(f"Cannot complete from status: {self.status}")
         self.status = SurveyStatus.COMPLETED
 
-    def fail(self) -> None:
+    def fail(self, message: str = "") -> None:
         """処理を失敗とする.
+
+        Args:
+            message: エラーメッセージ
 
         Raises:
             ValueError: 処理中でない場合
@@ -88,3 +107,5 @@ class Survey:
         if self.status != SurveyStatus.PROCESSING:
             raise ValueError(f"Cannot fail from status: {self.status}")
         self.status = SurveyStatus.FAILED
+        if message:
+            self.error_message = message
