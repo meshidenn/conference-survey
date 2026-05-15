@@ -43,6 +43,11 @@ export async function startProcessing(surveyId: string): Promise<SurveyResponse>
   return handleResponse<SurveyResponse>(response);
 }
 
+export async function getSurveyStatus(surveyId: string): Promise<SurveyResponse> {
+  const response = await fetch(`${BASE_URL}/surveys/${surveyId}/status`);
+  return handleResponse<SurveyResponse>(response);
+}
+
 export async function getMindmap(surveyId: string): Promise<MindmapResponse> {
   const response = await fetch(`${BASE_URL}/surveys/${surveyId}/mindmap`);
   return handleResponse<MindmapResponse>(response);

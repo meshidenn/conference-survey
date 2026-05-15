@@ -60,6 +60,10 @@ export default function TagStatsPage() {
 
   const sortedTags = [...tags].sort((a, b) => b.paperCount - a.paperCount);
 
+  // タグが付いている論文IDを集計
+  const taggedPaperIds = new Set(tags.flatMap((t) => t.paperIds));
+  const untaggedCount = survey.papers.length - taggedPaperIds.size;
+
   const getTagLevel = (tag: TagNodeResponse): number => {
     if (!tag.parentId) return 0;
     const parent = tags.find((t) => t.id === tag.parentId);
@@ -71,6 +75,16 @@ export default function TagStatsPage() {
       <Typography variant="h4" gutterBottom>
         Tag Statistics: {survey.conferenceType} {survey.year}
       </Typography>
+
+      <Box sx={{ display: "flex", gap: 3, mb: 2 }}>
+        <Typography variant="body1">
+          Total: {survey.papers.length} papers
+        </Typography>
+        <Typography variant="body1" color={untaggedCount > 0 ? "warning.main" : "success.main"}>
+          Untagged: {untaggedCount} papers
+          {untaggedCount > 0 && ` (${Math.round((untaggedCount / survey.papers.length) * 100)}%)`}
+        </Typography>
+      </Box>
 
       {tags.length === 0 ? (
         <Paper sx={{ p: 3, textAlign: "center" }}>

@@ -42,7 +42,11 @@ export default function MindmapView({ mindmap }: Props) {
       markmapRef.current.setData(root);
       markmapRef.current.fit();
     } else {
-      markmapRef.current = Markmap.create(svgRef.current, {}, root);
+      markmapRef.current = Markmap.create(svgRef.current, {
+        initialExpandLevel: 1,
+        spacingVertical: 8,
+        paddingX: 16,
+      }, root);
     }
   }, [mindmap]);
 
@@ -57,7 +61,7 @@ export default function MindmapView({ mindmap }: Props) {
   }
 
   return (
-    <Paper sx={{ p: 2, height: 500 }}>
+    <Paper sx={{ p: 2, height: "80vh" }}>
       <Box sx={{ width: "100%", height: "100%" }}>
         <svg ref={svgRef} style={{ width: "100%", height: "100%" }} />
       </Box>

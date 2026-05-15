@@ -15,7 +15,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import MindmapView from "../components/MindmapView";
 import PaperList from "../components/PaperList";
-import { getSurvey, getMindmap, startProcessing } from "../services/api";
+import { getSurvey, getMindmap, startProcessing, getSurveyStatus } from "../services/api";
 import type { SurveyDetailResponse, MindmapResponse } from "../types/survey";
 
 const statusColor = (status: string): "default" | "primary" | "success" | "error" => {
@@ -67,9 +67,37 @@ export default function SurveyDetailPage() {
   useEffect(() => {
     if (!survey || survey.status !== "processing") return;
 
-    const interval = setInterval(loadSurvey, 5000);
-    return () => clearInterval(interval);
-  }, [survey, loadSurvey]);
+    let isMounted = true;
+
+    // processing中は軽量なstatusエンドポイントをポーリング
+    const interval = setInterval(async () => {
+      if (!id || !isMounted) return;
+      try {
+        const status = await getSurveyStatus(id);
+        if (!isMounted) return;
+        // 完了またはエラー時はフル情報を取得（ステータスを先に変えない）
+        if (status.status === "completed" || status.status === "failed") {
+          clearInterval(interval);
+          if (isMounted) await loadSurvey();
+        } else {
+          setSurvey((prev) => prev ? {
+            ...prev,
+            status: status.status,
+            progressMessage: status.progressMessage,
+            progressCurrent: status.progressCurrent,
+            progressTotal: status.progressTotal,
+            errorMessage: status.errorMessage,
+          } : prev);
+        }
+      } catch {
+        // ポーリングエラーは無視
+      }
+    }, 3000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [survey?.status, id]);
 
   const handleStartProcessing = async () => {
     if (!id) return;
@@ -109,14 +137,18 @@ export default function SurveyDetailPage() {
           label={survey.status}
           color={statusColor(survey.status)}
         />
-        {survey.status === "pending" && (
+        {(survey.status === "pending" || survey.status === "failed") && (
           <Button
             variant="contained"
             startIcon={<PlayArrowIcon />}
             onClick={handleStartProcessing}
             disabled={isProcessing}
           >
-            {isProcessing ? "Starting..." : "Start Processing"}
+            {isProcessing
+              ? "Starting..."
+              : survey.status === "failed"
+                ? "Retry Processing"
+                : "Start Processing"}
           </Button>
         )}
         {survey.status === "completed" && (
@@ -137,10 +169,45 @@ export default function SurveyDetailPage() {
         </Alert>
       )}
 
+      {survey.status === "failed" && !error && (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          Processing failed. You can retry using the button above.
+          {survey.errorMessage && (
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              {survey.errorMessage}
+            </Typography>
+          )}
+        </Alert>
+      )}
+
+      {survey.status === "completed" && survey.errorMessage && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          {survey.errorMessage}
+        </Alert>
+      )}
+
       {survey.status === "processing" && (
-        <Paper sx={{ p: 3, mb: 3, display: "flex", alignItems: "center", gap: 2 }}>
-          <CircularProgress size={24} />
-          <Typography>Processing... This may take a while.</Typography>
+        <Paper sx={{ p: 3, mb: 3 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: survey.progressTotal > 0 ? 1.5 : 0 }}>
+            <CircularProgress size={24} />
+            <Typography>
+              {survey.progressMessage || "Processing..."}
+              {survey.progressTotal > 0 && ` (${survey.progressCurrent}/${survey.progressTotal})`}
+            </Typography>
+          </Box>
+          {survey.progressTotal > 0 && (
+            <Box sx={{ width: "100%", bgcolor: "grey.200", borderRadius: 1, height: 8 }}>
+              <Box
+                sx={{
+                  width: `${Math.round((survey.progressCurrent / survey.progressTotal) * 100)}%`,
+                  bgcolor: "primary.main",
+                  borderRadius: 1,
+                  height: 8,
+                  transition: "width 0.5s ease",
+                }}
+              />
+            </Box>
+          )}
         </Paper>
       )}
 

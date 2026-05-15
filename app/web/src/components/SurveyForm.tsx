@@ -21,7 +21,7 @@ const CONFERENCE_TYPES: ConferenceType[] = ["ACL", "NAACL", "EMNLP", "EACL"];
 
 export default function SurveyForm({ onSubmit, isLoading }: Props) {
   const [conferenceType, setConferenceType] = useState<ConferenceType>("ACL");
-  const [year, setYear] = useState<number>(new Date().getFullYear());
+  const [year, setYear] = useState<number>(2024);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

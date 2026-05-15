@@ -13,6 +13,10 @@ export interface SurveyResponse {
   year: number;
   status: SurveyStatus;
   paperCount: number;
+  progressMessage: string;
+  progressCurrent: number;
+  progressTotal: number;
+  errorMessage: string;
 }
 
 export interface PaperResponse {
@@ -40,6 +44,10 @@ export interface SurveyDetailResponse {
   status: SurveyStatus;
   papers: PaperResponse[];
   tagHierarchy: TagNodeResponse[];
+  progressMessage: string;
+  progressCurrent: number;
+  progressTotal: number;
+  errorMessage: string;
 }
 
 export interface MindmapNode {
