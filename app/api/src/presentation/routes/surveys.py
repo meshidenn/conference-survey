@@ -132,9 +132,7 @@ async def list_surveys() -> list[SurveyResponse]:
 
 
 @router.post("/{survey_id}/process", response_model=SurveyResponse, status_code=202)
-async def process_survey(
-    survey_id: str, background_tasks: BackgroundTasks
-) -> SurveyResponse:
+async def process_survey(survey_id: str, background_tasks: BackgroundTasks) -> SurveyResponse:
     """サーベイ処理を開始する（非同期）.
 
     タグ生成、階層化、要約生成、特徴抽出を非同期で実行する。

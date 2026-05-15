@@ -65,8 +65,7 @@ def parse_conference_type(conference_type: str) -> ConferenceType:
     except ValueError:
         valid_types = [ct.value for ct in ConferenceType]
         raise ValueError(
-            f"Invalid conference type: {conference_type}. "
-            f"Valid types are: {', '.join(valid_types)}"
+            f"Invalid conference type: {conference_type}. Valid types are: {', '.join(valid_types)}"
         )
 
 

@@ -26,9 +26,7 @@ Guidelines:
         """
         self._llm_client = llm_client
 
-    async def generate_summary(
-        self, texts: list[str], category_name: str
-    ) -> dict:
+    async def generate_summary(self, texts: list[str], category_name: str) -> dict:
         """複数のテキストからカテゴリの要約を生成する.
 
         Args:

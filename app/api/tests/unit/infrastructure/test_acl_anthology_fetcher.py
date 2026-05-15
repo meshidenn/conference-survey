@@ -60,8 +60,7 @@ class TestAclAnthologyFetcher:
 
         # 正しいURLが呼ばれたことを確認
         mock_client.get.assert_called_once_with(
-            "https://raw.githubusercontent.com/acl-org/acl-anthology"
-            "/master/data/xml/2024.acl.xml"
+            "https://raw.githubusercontent.com/acl-org/acl-anthology/master/data/xml/2024.acl.xml"
         )
 
     @pytest.mark.asyncio
@@ -112,8 +111,7 @@ class TestAclAnthologyFetcher:
         await fetcher.fetch(conference)
 
         mock_client.get.assert_called_once_with(
-            "https://raw.githubusercontent.com/acl-org/acl-anthology"
-            "/master/data/xml/2024.naacl.xml"
+            "https://raw.githubusercontent.com/acl-org/acl-anthology/master/data/xml/2024.naacl.xml"
         )
 
     @pytest.mark.asyncio

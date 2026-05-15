@@ -6,7 +6,7 @@ import httpx
 import pytest
 
 from src.domain.models.paper import Paper
-from src.domain.models.survey import Survey, SurveyStatus
+from src.domain.models.survey import Survey
 from src.domain.models.tag_hierarchy import TagHierarchy
 from src.domain.models.tag_node import TagNode
 from src.domain.models.value_objects import (

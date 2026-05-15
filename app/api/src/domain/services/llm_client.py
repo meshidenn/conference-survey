@@ -37,9 +37,7 @@ class LLMClient(ABC):
         pass
 
     @abstractmethod
-    async def generate_json(
-        self, prompt: str, system_prompt: str | None = None
-    ) -> dict:
+    async def generate_json(self, prompt: str, system_prompt: str | None = None) -> dict:
         """JSON形式でテキストを生成する.
 
         Args:

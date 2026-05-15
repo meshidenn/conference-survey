@@ -32,9 +32,7 @@ class AclAnthologyFetcher(PaperFetcher):
         ConferenceType.EACL: "eacl",
     }
 
-    BASE_URL = (
-        "https://raw.githubusercontent.com/acl-org/acl-anthology/master/data/xml"
-    )
+    BASE_URL = "https://raw.githubusercontent.com/acl-org/acl-anthology/master/data/xml"
 
     def __init__(self, client: httpx.AsyncClient | None = None):
         """初期化.

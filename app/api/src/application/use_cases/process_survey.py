@@ -88,7 +88,9 @@ class ProcessSurveyUseCase:
                     finally:
                         completed_count += 1
                         survey.update_progress(
-                            f"タグ生成中 (スキップ: {skip_counts['タグ生成']}件)" if skip_counts["タグ生成"] > 0 else "タグ生成中",
+                            f"タグ生成中 (スキップ: {skip_counts['タグ生成']}件)"
+                            if skip_counts["タグ生成"] > 0
+                            else "タグ生成中",
                             completed_count,
                             total_papers,
                         )
@@ -112,14 +114,10 @@ class ProcessSurveyUseCase:
                     tag_mapping[variant] = canonical
 
             # Step 3: タグを階層化
-            canonical_tags = list(
-                set(tag_mapping.get(tag, tag) for tag in unique_tags)
-            )
+            canonical_tags = list(set(tag_mapping.get(tag, tag) for tag in unique_tags))
             survey.update_progress("タグを階層化中", 0, 0)
             await self._survey_repository.save(survey)
-            hierarchy_result = await self._hierarchy_agent.create_hierarchy(
-                canonical_tags
-            )
+            hierarchy_result = await self._hierarchy_agent.create_hierarchy(canonical_tags)
 
             # canonical_tag → paper_idsのマッピングを構築
             canonical_tag_to_papers: dict[str, list[str]] = {}
@@ -230,7 +228,9 @@ class ProcessSurveyUseCase:
             await self._survey_repository.save(survey)
 
             # スキップ情報をまとめる
-            skipped_parts = [f"{step}: {count}件" for step, count in skip_counts.items() if count > 0]
+            skipped_parts = [
+                f"{step}: {count}件" for step, count in skip_counts.items() if count > 0
+            ]
             if skipped_parts:
                 survey.error_message = f"一部スキップあり ({', '.join(skipped_parts)})"
                 logger.info(f"サーベイ処理完了（{survey.error_message}）")

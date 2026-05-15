@@ -38,9 +38,7 @@ class TestTagGeneratorAgent:
     async def test_generate_tags_returns_3_to_5_tags(self):
         """3-5個のタグを返す."""
         mock_llm = AsyncMock()
-        mock_llm.generate_json.return_value = {
-            "tags": ["Tag1", "Tag2", "Tag3", "Tag4", "Tag5"]
-        }
+        mock_llm.generate_json.return_value = {"tags": ["Tag1", "Tag2", "Tag3", "Tag4", "Tag5"]}
 
         agent = TagGeneratorAgent(llm_client=mock_llm)
         tags = await agent.generate_tags("Some abstract text")

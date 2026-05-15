@@ -28,9 +28,7 @@ class CharacteristicAgent:
         """
         self._llm_client = llm_client
 
-    async def extract_characteristics(
-        self, abstract: str, context: str | None = None
-    ) -> dict:
+    async def extract_characteristics(self, abstract: str, context: str | None = None) -> dict:
         """論文の特徴を抽出する.
 
         Args:

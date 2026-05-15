@@ -51,7 +51,15 @@ class TestProcessSurveyUseCase:
         mock_hierarchy_agent = AsyncMock()
         mock_hierarchy_agent.merge_similar_tags.return_value = {"merged_tags": []}
         mock_hierarchy_agent.create_hierarchy.return_value = {
-            "categories": [{"name": "Category1", "children": [{"name": "Tag1", "original_tags": ["Tag1"]}, {"name": "Tag2", "original_tags": ["Tag2"]}]}]
+            "categories": [
+                {
+                    "name": "Category1",
+                    "children": [
+                        {"name": "Tag1", "original_tags": ["Tag1"]},
+                        {"name": "Tag2", "original_tags": ["Tag2"]},
+                    ],
+                }
+            ]
         }
 
         mock_summary_agent = AsyncMock()
@@ -92,7 +100,15 @@ class TestProcessSurveyUseCase:
         mock_hierarchy_agent = AsyncMock()
         mock_hierarchy_agent.merge_similar_tags.return_value = {"merged_tags": []}
         mock_hierarchy_agent.create_hierarchy.return_value = {
-            "categories": [{"name": "Category1", "children": [{"name": "Tag1", "original_tags": ["Tag1"]}, {"name": "Tag2", "original_tags": ["Tag2"]}]}]
+            "categories": [
+                {
+                    "name": "Category1",
+                    "children": [
+                        {"name": "Tag1", "original_tags": ["Tag1"]},
+                        {"name": "Tag2", "original_tags": ["Tag2"]},
+                    ],
+                }
+            ]
         }
 
         mock_summary_agent = AsyncMock()
@@ -150,7 +166,9 @@ class TestProcessSurveyUseCase:
         mock_hierarchy_agent = AsyncMock()
         mock_hierarchy_agent.merge_similar_tags.return_value = {"merged_tags": []}
         mock_hierarchy_agent.create_hierarchy.return_value = {
-            "categories": [{"name": "Category1", "children": [{"name": "Tag1", "original_tags": ["Tag1"]}]}]
+            "categories": [
+                {"name": "Category1", "children": [{"name": "Tag1", "original_tags": ["Tag1"]}]}
+            ]
         }
 
         mock_summary_agent = AsyncMock()

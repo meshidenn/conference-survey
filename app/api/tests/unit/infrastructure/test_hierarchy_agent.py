@@ -65,10 +65,7 @@ class TestHierarchyAgent:
         """5-10個のカテゴリを返すことを期待する."""
         mock_llm = AsyncMock()
         mock_llm.generate_json.return_value = {
-            "categories": [
-                {"name": f"Category{i}", "children": [f"Tag{i}"]}
-                for i in range(7)
-            ]
+            "categories": [{"name": f"Category{i}", "children": [f"Tag{i}"]} for i in range(7)]
         }
 
         agent = HierarchyAgent(llm_client=mock_llm)

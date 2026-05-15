@@ -33,9 +33,7 @@ class LiteLLMClient(LLMClient):
         self._api_base = api_base or settings.llm_api_base
         self._model_name = model_name or settings.llm_model_name
 
-    async def generate(
-        self, prompt: str, system_prompt: str | None = None
-    ) -> LLMResponse:
+    async def generate(self, prompt: str, system_prompt: str | None = None) -> LLMResponse:
         """テキストを生成する.
 
         Args:
@@ -55,7 +53,8 @@ class LiteLLMClient(LLMClient):
         if self._api_base and not model.startswith("openai/"):
             model = f"openai/{model.split('/')[-1]}" if "/" in model else f"openai/{model}"
 
-        # カスタム api_base（LM Studio 等）では API キー不要だが、OpenAI クライアントが要求するためダミーを渡す
+        # カスタム api_base（LM Studio 等）ではAPIキー不要だが、
+        # OpenAIクライアントが要求するためダミーを渡す
         kwargs = {"model": model, "messages": messages, "api_base": self._api_base}
         if self._api_base:
             kwargs["api_key"] = "lm-studio"
@@ -72,15 +71,16 @@ class LiteLLMClient(LLMClient):
                 raise
             except Exception as e:
                 if attempt < max_retries - 1:
-                    wait = 2 ** attempt  # 1秒, 2秒, ...
-                    logger.warning(f"LLM呼び出し失敗 (試行{attempt + 1}/{max_retries}): {e}. {wait}秒後にリトライ")
+                    wait = 2**attempt  # 1秒, 2秒, ...
+                    logger.warning(
+                        f"LLM呼び出し失敗 (試行{attempt + 1}/{max_retries}): "
+                        f"{e}. {wait}秒後にリトライ"
+                    )
                     await asyncio.sleep(wait)
                 else:
                     raise
 
-    async def generate_json(
-        self, prompt: str, system_prompt: str | None = None
-    ) -> dict:
+    async def generate_json(self, prompt: str, system_prompt: str | None = None) -> dict:
         """JSON形式でテキストを生成する.
 
         Args:
@@ -112,11 +112,16 @@ class LiteLLMClient(LLMClient):
                 # LLMがLaTeX（\phi, \mathcal等）を含むJSONを返す場合、
                 # 無効なエスケープシーケンスを修復してリトライ
                 try:
-                    fixed = re.sub(r'(?<!\\)\\(?!["\\/bfnrtu])', r'\\\\', content)
+                    fixed = re.sub(r'(?<!\\)\\(?!["\\/bfnrtu])', r"\\\\", content)
                     return json.loads(fixed)
                 except json.JSONDecodeError as e2:
                     if attempt < max_retries - 1:
-                        logger.warning(f"JSONパース失敗 (試行{attempt + 1}/{max_retries}): {e2}. リトライします")
+                        logger.warning(
+                            f"JSONパース失敗 (試行{attempt + 1}/{max_retries}): "
+                            f"{e2}. リトライします"
+                        )
                     else:
-                        logger.error(f"JSONパース失敗、リトライ上限到達。レスポンス: {content[:200]}")
+                        logger.error(
+                            f"JSONパース失敗、リトライ上限到達。レスポンス: {content[:200]}"
+                        )
                         raise

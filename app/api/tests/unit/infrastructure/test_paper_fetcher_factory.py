@@ -1,6 +1,5 @@
 """PaperFetcherFactoryのテスト."""
 
-
 from src.domain.models.value_objects import Conference, ConferenceType
 from src.infrastructure.paper_fetchers.acl_anthology_fetcher import AclAnthologyFetcher
 from src.infrastructure.paper_fetchers.factory import PaperFetcherFactory
