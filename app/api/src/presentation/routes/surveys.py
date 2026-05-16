@@ -154,7 +154,7 @@ async def process_survey(survey_id: str, background_tasks: BackgroundTasks) -> S
             detail="Processing already in progress",
         )
 
-    if survey.status.value not in ("pending", "failed"):
+    if survey.status.value not in ("pending", "failed", "completed"):
         raise HTTPException(
             status_code=409,
             detail=f"Cannot start processing from status: {survey.status.value}",

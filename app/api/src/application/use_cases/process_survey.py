@@ -59,8 +59,12 @@ class ProcessSurveyUseCase:
         if survey is None:
             raise ValueError(f"Survey not found: {survey_id}")
 
-        # 処理開始
+        # 処理開始（再処理時は既存タグ情報を初期化）
         survey.start_processing()
+        survey.tag_hierarchy = TagHierarchy()
+        survey.error_message = ""
+        for paper in survey.papers:
+            paper.tags = []
         await self._survey_repository.save(survey)
 
         skip_counts: dict[str, int] = {}

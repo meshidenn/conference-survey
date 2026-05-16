@@ -120,6 +120,20 @@ class TestSurvey:
         survey.fail()
         assert survey.status == SurveyStatus.FAILED
 
+
+    def test_can_start_processing_from_completed(self):
+        """完了状態から再処理を開始できる."""
+        survey = Survey(
+            id=SurveyId.generate(),
+            conference=Conference(type=ConferenceType.ACL, year=2024),
+        )
+        survey.start_processing()
+        survey.complete()
+
+        survey.start_processing()
+
+        assert survey.status == SurveyStatus.PROCESSING
+
     def test_cannot_start_processing_if_already_processing(self):
         """処理中から再度処理開始はできない."""
         survey = Survey(
