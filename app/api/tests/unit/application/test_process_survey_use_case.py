@@ -147,6 +147,9 @@ class TestProcessSurveyUseCase:
         old_tag_id = TagId.generate()
         survey.papers[0].tags = [old_tag_id]
         survey.tag_hierarchy.add_node(TagNode(id=old_tag_id, name="OldTag"))
+        survey.progress_message = "完了済み"
+        survey.progress_current = 10
+        survey.progress_total = 10
 
         mock_repository = AsyncMock()
         mock_repository.find_by_id.return_value = survey
@@ -166,7 +169,9 @@ class TestProcessSurveyUseCase:
         mock_summary_agent.generate_summary.return_value = {"summary": "Summary", "key_themes": []}
 
         mock_characteristic_agent = AsyncMock()
-        mock_characteristic_agent.extract_characteristics.return_value = {"characteristics": "Characteristic"}
+        mock_characteristic_agent.extract_characteristics.return_value = {
+            "characteristics": "Characteristic"
+        }
 
         use_case = ProcessSurveyUseCase(
             survey_repository=mock_repository,
@@ -181,6 +186,9 @@ class TestProcessSurveyUseCase:
         assert all(len(p.tags) > 0 for p in survey.papers)
         assert old_tag_id not in survey.papers[0].tags
         assert old_tag_id not in survey.tag_hierarchy.nodes
+        assert survey.progress_message != "完了済み"
+        assert survey.progress_current != 10
+        assert survey.progress_total != 10
 
     @pytest.mark.asyncio
     async def test_process_survey_not_found(self):

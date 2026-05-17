@@ -62,6 +62,9 @@ class ProcessSurveyUseCase:
         # 処理開始（再処理時は既存タグ情報を初期化）
         survey.start_processing()
         survey.tag_hierarchy = TagHierarchy()
+        survey.progress_message = ""
+        survey.progress_current = 0
+        survey.progress_total = 0
         survey.error_message = ""
         for paper in survey.papers:
             paper.tags = []
