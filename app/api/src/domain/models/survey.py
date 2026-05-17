@@ -79,9 +79,9 @@ class Survey:
         """処理を開始する（初回または再試行）.
 
         Raises:
-            ValueError: 既に処理中または完了している場合
+            ValueError: 既に処理中の場合
         """
-        if self.status not in (SurveyStatus.PENDING, SurveyStatus.FAILED):
+        if self.status not in (SurveyStatus.PENDING, SurveyStatus.FAILED, SurveyStatus.COMPLETED):
             raise ValueError(f"Cannot start processing from status: {self.status}")
         self.status = SurveyStatus.PROCESSING
 

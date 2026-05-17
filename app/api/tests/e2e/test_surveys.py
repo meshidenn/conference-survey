@@ -6,7 +6,7 @@ import httpx
 import pytest
 
 from src.domain.models.paper import Paper
-from src.domain.models.survey import Survey
+from src.domain.models.survey import Survey, SurveyStatus
 from src.domain.models.tag_hierarchy import TagHierarchy
 from src.domain.models.tag_node import TagNode
 from src.domain.models.value_objects import (
@@ -138,6 +138,22 @@ class TestGetSurvey:
         assert data["papers"][0]["authors"] == ["Author A"]
         assert data["papers"][0]["abstract"] == "Test abstract."
 
+    async def test_完了済みサーベイを再処理開始できる(self, client, repository):
+        """正常系: completed状態でも処理を再開始できる."""
+        survey = Survey(
+            id=SurveyId.generate(),
+            conference=Conference(type=ConferenceType.ACL, year=2024),
+            status=SurveyStatus.COMPLETED,
+        )
+        await repository.save(survey)
+
+        with patch(f"{_ROUTES}.get_process_survey_use_case") as mock_uc:
+            mock_uc.return_value = AsyncMock()
+            response = await client.post(f"/surveys/{survey.id}/process")
+
+        assert response.status_code == 202
+        assert response.json()["status"] == "processing"
+
     async def test_存在しないサーベイで404エラー(self, client):
         """異常系: 存在しないIDで404が返る."""
         fake_id = SurveyId.generate()
@@ -205,6 +221,22 @@ class TestProcessSurvey:
         data = response.json()
         assert data["status"] == "processing"
         assert data["id"] == str(survey.id)
+
+    async def test_完了済みサーベイを再処理開始できる(self, client, repository):
+        """正常系: completed状態でも処理を再開始できる."""
+        survey = Survey(
+            id=SurveyId.generate(),
+            conference=Conference(type=ConferenceType.ACL, year=2024),
+            status=SurveyStatus.COMPLETED,
+        )
+        await repository.save(survey)
+
+        with patch(f"{_ROUTES}.get_process_survey_use_case") as mock_uc:
+            mock_uc.return_value = AsyncMock()
+            response = await client.post(f"/surveys/{survey.id}/process")
+
+        assert response.status_code == 202
+        assert response.json()["status"] == "processing"
 
     async def test_存在しないサーベイで404エラー(self, client):
         """異常系: 存在しないIDで404が返る."""
@@ -284,6 +316,22 @@ class TestGetMindmap:
         assert child["name"] == "Transformer"
         assert child["paperCount"] == 1
         assert child["summary"] == "Transformerに関する研究"
+
+    async def test_完了済みサーベイを再処理開始できる(self, client, repository):
+        """正常系: completed状態でも処理を再開始できる."""
+        survey = Survey(
+            id=SurveyId.generate(),
+            conference=Conference(type=ConferenceType.ACL, year=2024),
+            status=SurveyStatus.COMPLETED,
+        )
+        await repository.save(survey)
+
+        with patch(f"{_ROUTES}.get_process_survey_use_case") as mock_uc:
+            mock_uc.return_value = AsyncMock()
+            response = await client.post(f"/surveys/{survey.id}/process")
+
+        assert response.status_code == 202
+        assert response.json()["status"] == "processing"
 
     async def test_存在しないサーベイで404エラー(self, client):
         """異常系: 存在しないIDで404が返る."""
