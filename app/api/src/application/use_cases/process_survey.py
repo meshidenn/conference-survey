@@ -68,6 +68,7 @@ class ProcessSurveyUseCase:
         survey.error_message = ""
         for paper in survey.papers:
             paper.tags = []
+            paper.characteristics = None
         await self._survey_repository.save(survey)
 
         skip_counts: dict[str, int] = {}

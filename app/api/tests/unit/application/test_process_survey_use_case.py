@@ -150,6 +150,7 @@ class TestProcessSurveyUseCase:
         survey.progress_message = "完了済み"
         survey.progress_current = 10
         survey.progress_total = 10
+        survey.papers[0].characteristics = "Old characteristic"
 
         mock_repository = AsyncMock()
         mock_repository.find_by_id.return_value = survey
@@ -189,6 +190,7 @@ class TestProcessSurveyUseCase:
         assert survey.progress_message != "完了済み"
         assert survey.progress_current != 10
         assert survey.progress_total != 10
+        assert survey.papers[0].characteristics == "Characteristic"
 
     @pytest.mark.asyncio
     async def test_process_survey_not_found(self):
