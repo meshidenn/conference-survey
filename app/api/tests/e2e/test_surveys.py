@@ -138,7 +138,6 @@ class TestGetSurvey:
         assert data["papers"][0]["authors"] == ["Author A"]
         assert data["papers"][0]["abstract"] == "Test abstract."
 
-
     async def test_完了済みサーベイを再処理開始できる(self, client, repository):
         """正常系: completed状態でも処理を再開始できる."""
         survey = Survey(
@@ -222,7 +221,6 @@ class TestProcessSurvey:
         data = response.json()
         assert data["status"] == "processing"
         assert data["id"] == str(survey.id)
-
 
     async def test_完了済みサーベイを再処理開始できる(self, client, repository):
         """正常系: completed状態でも処理を再開始できる."""
@@ -318,7 +316,6 @@ class TestGetMindmap:
         assert child["name"] == "Transformer"
         assert child["paperCount"] == 1
         assert child["summary"] == "Transformerに関する研究"
-
 
     async def test_完了済みサーベイを再処理開始できる(self, client, repository):
         """正常系: completed状態でも処理を再開始できる."""

@@ -136,7 +136,6 @@ class TestProcessSurveyUseCase:
         # 各論文に対してタグ生成が呼ばれたことを確認
         assert mock_tag_generator.generate_tags.call_count == 2
 
-
     @pytest.mark.asyncio
     async def test_reprocess_clears_existing_tags_and_hierarchy(self):
         """再処理時は既存タグと階層を初期化して再生成する."""

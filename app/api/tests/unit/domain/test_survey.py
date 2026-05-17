@@ -120,7 +120,6 @@ class TestSurvey:
         survey.fail()
         assert survey.status == SurveyStatus.FAILED
 
-
     def test_can_start_processing_from_completed(self):
         """完了状態から再処理を開始できる."""
         survey = Survey(
